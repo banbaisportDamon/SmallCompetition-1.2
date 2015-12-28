@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	
+    <script src="js/mui.min.js"></script>
+	<script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/configure.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/base.css" rel="stylesheet"/>
+    <style>
+    		header.mui-bar.mui-bar-nav {background-color: #18b4ed;}
+    		header.mui-bar.mui-bar-nav a{color:#fff;}
+    		header.mui-bar.mui-bar-nav span{color:#fff; height:1.6em}
+    		header.mui-bar.mui-bar-nav h1 {color:#fff;}
+    		input.mui-input-clear {background-color: #fff;}
+    	    	.tournament {
+    			padding: 15px 5px;
+    			background-color: #fff;
+    			border-bottom: 1px solid #c8c8c8;
+    			border-top: 1px solid #c8c8c8;
+    			margin-bottom: 20px;
+    		}
+    		.mui-popover { width:150px }
+    		.mui-content .mui-content-padded { margin: 5px }
+    </style>
+    <script>
+       	var user_id = -1;
+		var login_time = 0;
+       	var id_check = '';
+		var currentPage="tournamentList";
+		
+		$(document).ready(function() {
+		    $("#mainContent").height( $(window).height() - 50 );
+	        setIdAndLoginTime(1439286113287,0);
+			var menuElem = document.getElementById("menu");
+			var contentWebview = null;
+			menuElem.addEventListener('click', function(e) {
+				  if ( currentPage=="competitionDetail" ) {
+				    try{
+					  document.getElementById("mainContent").contentWindow.addMatch();
+					}catch(e){
+					}
+				  } else {
+					currentPage="createMinorTournamentNew";
+					$("#mainContent").attr("src","createMinorTournamentNew.html");
+					$("#top_title").html("创建比赛");
+					$("#menu").hide();
+					$("#done").hide();
+				  }
+			});
+        } );
+		
+		function showDetailPage(sid,isCanopt){
+		    currentPage="competitionDetail";
+			$("#top_title").html("比赛详情");
+		    if ( isCanopt ) {
+			  $("#menu").show();
+			} else {
+			  $("#menu").hide();
+			}
+		    $("#done").hide();
+		    $("#mainContent").attr("src","competitionDetail.html?sid="+sid+"&");
+		}
+
+       	function setIdAndLoginTime(memberId,loginTime){
+			user_id = memberId;
+			login_time = loginTime;
+			id_check = memberId+","+loginTime;
+			$("#mainContent").attr("src","tournamentList.html?userId="+user_id+"&loginTime="+login_time);
+		}
+		
+		function showSelectMultiFriendPage(){
+		   currentPage="selectMultiFriend";
+		   $("#top_title").html("选择好友");
+		   $("#menu").hide();
+		   $("#done").show();
+		}
+		
+		function showSelectFriendPage(){
+		   currentPage="selectFriend";
+		   $("#top_title").html("选择好友");
+		   $("#menu").hide();
+		   $("#done").show();
+		}
+		
+		function setDoneBtnText(count){
+		            var done = document.getElementById('done');
+					var value = count ? "完成(" + count + ")" : "完成";
+		            done.innerHTML = value;
+					if (count) {
+						if (done.classList.contains("mui-disabled")) {
+							done.classList.remove("mui-disabled");
+						}
+					} else {
+						if (!done.classList.contains("mui-disabled")) {
+							done.classList.add("mui-disabled");
+						}
+					}
+		}
+		
+		function doSelectDone(){
+		    setDoneBtnText(0);
+		    $("#top_title").html("小型比赛");
+			$("#done").hide();
+		    $("#menu").show();
+			try{
+			  document.getElementById("mainContent").contentWindow.doPageBack();
+			}catch(e){
+			}
+		}
+		
+		function goBack(){
+		    if ( currentPage=="selectFriend" ) {
+			   currentPage="createMinorTournamentNew";
+			   doSelectDone();
+			} else if ( currentPage=="selectMultiFriend" ) {
+			   currentPage="createMinorTournamentNew";
+			   doSelectDone();
+			} else if ( currentPage=="competitionDetail" ) {
+			   currentPage="tournamentList";
+			   $("#top_title").html("小型比赛");
+		       $("#menu").show();
+		       $("#done").hide();
+		       $("#mainContent").attr("src","tournamentList.html?userId="+user_id+"&loginTime="+login_time);
+			} else if ( currentPage=="createMinorTournamentNew" ) {
+			   currentPage="tournamentList";
+			   $("#top_title").html("小型比赛");
+		       $("#menu").show();
+		       $("#done").hide();
+		       $("#mainContent").attr("src","tournamentList.html?userId="+user_id+"&loginTime="+login_time);
+			} else {
+			   mui.alert("返回原生页面");
+			}
+		}
+	</script>
+</head>
+<body>
+	<header class="mui-bar mui-bar-nav">
+		<a onclick="goBack()" class="mui-icon mui-icon-left-nav mui-pull-left"></a>
+		<h1 id="top_title" class="mui-title">小型比赛</h1>
+		<span id="menu" class="mui-action-menu mui-icon mui-icon-plusempty mui-pull-right"></span>
+		<a id='done' onclick="doSelectDone()" style="display:none" class="mui-btn mui-btn-link mui-pull-right mui-btn-blue mui-disabled">完成</a>
+	</header>
+	<div class="mui-content">
+	  <iframe id="mainContent" src="about:blank" frameborder="0" width="100%" height="400px" ></iframe>
+	</div>
+</body>
+</html>

@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/base.css" rel="stylesheet"/>
+    <!--
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>-->
+    <style>
+    		* {color: #323a45;}
+    		header.mui-bar.mui-bar-nav {background-color: #18b4ed;}
+    		header.mui-bar.mui-bar-nav a{color:#fff;}
+    		header.mui-bar.mui-bar-nav span{color:#fff; height:1.6em}
+    		header.mui-bar.mui-bar-nav h1 {color:#fff;}
+    		header {
+    			box-shadow: none;
+    			-webkit-box-shadow:none;
+    		}
+    </style>
+</head>
+<body>
+	<header class="mui-navbar-inner mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="createMinorTournamentNew.html"></a>
+		<h1 class="mui-center mui-title tc">选择上场队员</h1>
+		<a id='done' class="mui-btn mui-btn-link mui-pull-right mui-btn-blue">完成</a>
+	</header>
+	<div class="mui-content">
+		<div class="p20 headimgs"><!--
+			<table width="100%">
+				<tr class="pt10 tc" height="120px">
+					<td id="addplayer" width="25%">
+						<a href="#"><img src="img/addplayer.png" width="65px" height="65px"/></a><br />&nbsp;
+					</td>
+					<td width="25%" class="pr">
+						<img src="img/teamleader.png" width="65px" height="65px" class="headimg selected" /><br /><span>马天宇</span>
+						<img src="img/playerselected.png" width="15px" height="15px" class="pa" style="top:15px; right: 10px;"/>
+					</td>
+					<td width="25%" class="pr">
+						<img src="img/teamleader.png" width="65px" height="65px" class="headimg" /><br /><span>马景涛</span>
+					</td>
+					<td width="25%" class="pr">
+						<img src="img/teamleader.png" width="65px" height="65px" class="headimg" /><br /><span>呵呵哒</span>
+					</td>
+				</tr>
+				<tr class="pt10 tc" height="120px">
+					<td width="25%" class="pr"><img src="img/teamleader.png" width="65px" height="65px" class="headimg"/><br /><span>黄勇刘</span></td>
+					<td width="25%" class="pr"><img src="img/teamleader.png" width="65px" height="65px" class="headimg"/><br /><span>马天宇</span></td>
+					<td width="25%" class="pr"><img src="img/teamleader.png" width="65px" height="65px" class="headimg"/><br /><span>马景涛</span></td>
+					<td width="25%" class="pr"><img src="img/teamleader.png" width="65px" height="65px" class="headimg"/><br /><span>呵呵哒</span></td>
+				</tr>
+			</table>-->
+		</div>
+		<div id="seed"><button>种子选手</button></div>
+	</div>
+	<script src="js/configure.js"></script>
+	<script src="js/jquery-1.10.2.min.js"></script>
+	<script>
+		mui.init({
+		  	preloadPages:[{
+		    		id:'selectMoreFriends.html',
+		    		url:'selectMoreFriends.html'           
+			}]
+		});
+		/*------------------------------------------------添加队友开始----------------------------------------------*/
+		
+		/*------------------------------------------------添加队友结束----------------------------------------------*/
+		/*------------------------------------------------选择队员开始----------------------------------------------*/
+		$(document).on('click', '.headimg', function(){
+			if(!$(this).hasClass("selected")){
+				$(".selected").each(function(index, element){
+					$($(this).parent().find("img")[1]).remove();
+					$(this).removeClass("selected");
+				});
+				$(this).parent().append('<img src="img/playerselected.png" width="15px" height="15px" class="pa" style="top:15px; right: 10px;"/>');
+				$(this).addClass("selected");
+			} else {
+				$($(this).parent().find("img")[1]).remove();
+				$(this).removeClass("selected");
+			}
+		});
+		/*------------------------------------------------选择队员结束----------------------------------------------*/
+		/*---------------------------自定义事件1——接收competitionDetail.html&selectMoreFriends.html数据开始--------------------------------*/
+		var wholeDetail = [];
+		var matchId = -1;
+		var pos = '';
+		window.addEventListener('selectedPlayer',function(event){
+			wholeDetail = event.detail.wholeDetail;
+			matchId = event.detail.matchId;
+			pos = event.detail.pos; 
+			//初始化头像
+			var total = wholeDetail.playerList.length + 1;
+			var num = (wholeDetail.playerList.length + 1)/4;
+			var i = 0;
+			var index = 0;
+			var ht = '';
+			$(".headimgs").html('');
+			ht +=	'<table width="100%">';
+			for(; i < num; i++){
+				ht +=	'<tr class="pt10 tc" height="120px">';
+				for(var j = 0; j < 4; j++, index++){
+					if(index == 0){
+						ht += '<td id="addplayer" width="25%"><a href="#"><img src="img/addplayer.png" width="65px" height="65px"/></a><br />&nbsp;</td>';
+					} else {
+						ht += '<td width="25%" class="pr">';
+						if(index < total){
+							ht +=	'<img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+wholeDetail.playerList[index-1].img_url+'" width="65px" height="65px" class="headimg" style="border-radius:50%"/><br />';
+							ht +=	'<span data-value="'+wholeDetail.playerList[index-1].player_id+'">'+wholeDetail.playerList[index-1].player_name+'</span>';
+						}
+						ht += '</td>';
+					}
+				}
+				ht += '</tr>';
+			}
+			ht += '</table>';
+			$(".headimgs").html( ht );
+		});
+		/*---------------------------自定义事件1——接收competitionDetail.html&selectMoreFriends.html数据结束--------------------------------*/
+		/*-----------------------------向selectMoreFriends.html发送已有好友数据开始---------------------------------*/
+		$(document).on('click', '#addplayer a',function(){
+			var detailPage = null;
+		  	if(!detailPage){
+		    		detailPage = plus.webview.getWebviewById('selectMoreFriends.html');
+		  	}
+		  	mui.fire(detailPage,'selectedFriends',{
+				wholeDetail:wholeDetail,
+				matchId:matchId,
+				pos:pos
+		  	});
+			mui.openWindow({ id:"selectMoreFriends.html", url:"selectMoreFriends.html"});
+		});
+		/*-----------------------------向selectMoreFriends.html发送已有好友数据结束---------------------------------*/
+		/*----------------------------------------事件监听——处理完成开始--------------------------------------------*/
+		var id_check = "1439286113287,0";
+   		
+		$(document).on("click", "#done", function(){
+			if($(".headimgs .selected").length == 0){
+				mui.alert("请选择一个上场运动员","温馨提示",function(){});
+			} else {
+				var friendId = $(".headimgs .selected").parent().find("span").attr("data-value");
+				//alert("friendId:"+friendId+" pos:"+pos+" matchId:"+matchId+" id_check:"+id_check);
+				setMatchPlayer(pos, friendId, matchId, id_check);
+			}
+		});
+		function setMatchPlayer(pos, id, matchId, id_check){
+           	var aoData=[];
+           	aoData.push( { "name":"id_check",		"value": id_check } );
+           	aoData.push( { "name":"match.id", 		"value": matchId } );
+           	//aoData.push( { "name":"match.team_1_a", "value": -1 } );
+           	//aoData.push( { "name":"match.team_1_b",	"value": -1 } );
+           	//aoData.push( { "name":"type",			"value": 1 } );
+           	switch(pos){
+           		case 'a1':
+           			aoData.push( { "name":"match.team_1_a", "value": id } );
+           			aoData.push( { "name":"match.team_1_b", "value": getSelectedId(wholeDetail.matchList, 'team_1_b') } );
+           			aoData.push( { "name":"type",			"value": 1 } );
+           			break;
+           		case 'a2':
+           			aoData.push( { "name":"match.team_1_a", "value": getSelectedId(wholeDetail.matchList, 'team_1_a') } );
+           			aoData.push( { "name":"match.team_1_b",	"value": id } );
+					aoData.push( { "name":"type",			"value": 1 } );
+           			break;
+           		case 'b1':
+           			aoData.push( { "name":"match.team_1_a", "value": id } );
+           			aoData.push( { "name":"match.team_1_b", "value": getSelectedId(wholeDetail.matchList, 'team_2_b') } );
+           			aoData.push( { "name":"type",			"value": 2 } );
+           			break;
+           		case 'b2':
+           			aoData.push( { "name":"match.team_1_a", "value": getSelectedId(wholeDetail.matchList, 'team_2_a') } );
+           			aoData.push( { "name":"match.team_1_b",	"value": id } );
+					aoData.push( { "name":"type",			"value": 2 } );
+           			break;
+           		default:
+           			break;
+           	}
+           	//alert('match.team_1_a:'+aoData[2].value+' match.team_1_b:'+aoData[3].value+' type:'+aoData[4].value);
+			doSendAjaxRequest("/actions/SmallSchedule.action?submitCompetitionMatchMember",aoData,callbackForSetMatchPlayer);
+        }
+		function getSelectedId(obj,name){
+			switch(name){
+				case 'team_1_a':
+					for(var i = 0; i < wholeDetail.matchList.length; i++){
+						if(wholeDetail.matchList[i].id == matchId){
+							if(wholeDetail.matchList[i].team_1_a != -1){
+								return wholeDetail.matchList[i].team_1_a;
+							}
+						}
+					}
+					break;
+				case 'team_1_b':
+					for(var i = 0; i < wholeDetail.matchList.length; i++){
+						if(wholeDetail.matchList[i].id == matchId){
+							if(wholeDetail.matchList[i].team_1_b != -1){
+								return wholeDetail.matchList[i].team_1_b;
+							}
+						}
+					}
+					break;
+				case 'team_2_a':
+					for(var i = 0; i < wholeDetail.matchList.length; i++){
+						if(wholeDetail.matchList[i].id == matchId){
+							if(wholeDetail.matchList[i].team_2_a != -1){
+								return wholeDetail.matchList[i].team_2_a;
+							}
+						}
+					}
+					break;
+				case 'team_2_b':
+					for(var i = 0; i < wholeDetail.matchList.length; i++){
+						if(wholeDetail.matchList[i].id == matchId){
+							if(wholeDetail.matchList[i].team_2_b != -1){
+								return wholeDetail.matchList[i].team_2_b;
+							}
+						}
+					}
+					break;
+			}
+			return -1;
+		}
+
+        function callbackForSetMatchPlayer(obj){
+        		try{
+            		if(obj.status == true){
+            			//向competitionDetail.html发送id激活myinit事件
+					var detailPage = null;
+				  	if(!detailPage){
+				    		detailPage = plus.webview.getWebviewById('competitionDetail.html');
+				  	}
+				  	mui.fire(detailPage,'myinit',{
+						id: wholeDetail.id
+				  	});
+            			mui.openWindow({
+						id:"competitionDetail.html", 
+						url:"competitionDetail.html",
+						createNew:false,
+						show: {
+							aniShow: 'slide-in-left',
+							uration: 200
+		                },
+		                waiting: {
+		                    autoShow: true, //自动显示等待框
+		                    title: '正在加载...', //等待对话框上显示的提示内容
+		                }
+					});
+            		} else {
+            			mui.alert("设置失败请重试","系统提示",function(){});
+            		}
+           } catch(e) {}
+        }
+
+        function doSendAjaxRequest(xurl,param,fnCallback){
+            if ( xurl.indexOf('http://') == -1 ) xurl = g_UrlBase+xurl;
+            $.ajax( {
+                "url":  xurl,
+                "data": param,
+                "timeout" : 10000,
+                "contentType" : "application/x-www-form-urlencoded; charset=utf-8",
+                "success": function (json) {
+                    try{
+                        fnCallback( json );
+                    }catch(e){}
+                },
+                "dataType": "json",
+                "cache": false,
+                "type": "POST",
+                "error": function (xhr, error, thrown) {
+                }
+            } );
+        }
+
+        function getUrlParam(xurl,name){
+            var para="";
+            if(xurl.lastIndexOf("?")>0){
+                para=xurl.substring(xurl.lastIndexOf("?")+1,xurl.length);
+                var arr=para.split("&");
+                para="";
+                for(var i=0;i<arr.length;i++){
+                   if(arr[i].split("=")[0]==name) return arr[i].split("=")[1];
+                }
+                return "";
+           }else{
+                return "";
+           }
+        }
+		/*----------------------------------------事件监听——处理完成开始--------------------------------------------*/
+		/*--------------------------------------------------页面链接------------------------------------------------*/
+		mui("#seed").on('tap', 'button', function(e){
+			mui.openWindow({ id:"singlesRound.html", url:"singlesRound.html"});
+		});
+	</script>
+</body>
+</html>

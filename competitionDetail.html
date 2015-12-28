@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+	
+	<script src="js/jquery-1.10.2.min.js"></script>
+    <script src="js/mui.min.js"></script>
+	<script src="js/mui.poppicker.js"></script>
+	<script src="js/mui.picker.min.js"></script>
+	<script src="js/configure.js"></script>
+	<script src="js/common.js"></script>
+	<link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/mui.picker.min.css" rel="stylesheet" />
+	<link href="css/mui.poppicker.css" rel="stylesheet" />
+    <link href="css/base.css" rel="stylesheet"/>
+    
+	<script>
+	/*-------------------------------------------初始化单项开始---------------------------------------------*/
+   		var schedule_id = -1;
+		var user_id = -1;
+        var id_check = '10,0';
+   		var wholeDetail = [];
+		var type = -1;
+		var typePicker=null;
+		
+		$(document).ready(function() {
+		   schedule_id=getUrlParam(document.URL,"sid");
+		   user_id=getUrlParam(document.URL,"userId");
+		   var loginTime=getUrlParam(document.URL,"loginTime");
+		   if ( user_id ) {
+		    id_check = user_id+","+loginTime;
+		   }
+		   getResult();
+	    } );
+    
+        function getResult(){
+           	var aoData=[];
+           	aoData.push( { "name":"id_check","value": id_check} );
+           	aoData.push( { "name":"smallSchedule.id", "value": schedule_id } );
+			doSendAjaxRequest("/actions/SmallSchedule.action?getSmallScheduleDetail",aoData,callbackOne);
+        }
+
+        function callbackOne(obj){
+           	try{
+           		wholeDetail = obj.body;
+           		//初始化	
+           		var ht = '';
+           		if(wholeDetail.team1_url){
+           			ht = '<img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+wholeDetail.team1_url+'" width="60px" height="60px" style="border-radius: 50%;" /><br /><span>红队</span>';
+           			$('.left').html( ht );	
+           		}
+           		if(wholeDetail.team2_url){
+           			ht = '<img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+wholeDetail.team2_url+'" width="60px" height="60px" style="border-radius: 50%;" /><br /><span>蓝队</span>';
+           			$('.right').html( ht );	
+           		}
+           		$('.score .score1').text( wholeDetail.score_1 );
+           		$('.score .score2').text( wholeDetail.score_2 );
+           		/*--------初始化各个match--------*/
+           		var typeName = ['男单', '男双', '女单', '女双', '混双'];
+           		for(var i = 0; i < wholeDetail.matchList.length; i++){
+       				ht += '<div class="competition mt10 ml5 mr5 pr">';
+					ht += 	'<table width="100%" class="pa" style="top:-3px">';
+					ht += 		'<tr height="40px">';
+					ht += 			'<td width="40%" class="tr f1d5">'+wholeDetail.matchList[i].score_1+'</td>';
+					ht +=			'<td width="20%" class="tc typebackground">'+typeName[parseInt(wholeDetail.matchList[i].competition_type)]+'</td>';
+					ht +=			'<td width="40%" class="tl f1d5">'+wholeDetail.matchList[i].score_2+'</td>';
+					ht +=		'</tr>';
+					ht +=	'</table>';
+					ht +=	'<hr class="mt20"></hr>';
+					switch (wholeDetail.matchList[i].competition_type)
+					{
+						case '0':
+						case '2':
+							ht +=	'<div class="competitionInfo mt20" data-tags="'+wholeDetail.matchList[i].id+'">';
+							ht +=		'<img src="img/before.png" width="20px" height="20px" class="pa" style="top:0;right: 0;" />';
+							ht +=		'<table width="100%"><tbody>';
+							ht +=			'<tr>';
+							ht +=				'<td width="40%" class="tc oneplayer" data-tags="a1">';
+							if(wholeDetail.matchList[i].team_1_a != -1){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_1_a)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_1_a)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员1</span>';
+							}
+							ht +=				'</td>';
+							ht +=				'<td width="20%" class="tc">VS</td>';
+							ht +=				'<td width="40%" class="tc oneplayer" data-tags="b1">';
+							if(wholeDetail.matchList[i].team_2_a != -1){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_2_a)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_2_a)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员2</span>';
+							}
+							ht +=				'</td>';
+							ht +=			'</tr>';
+							for(var j = 0; j < wholeDetail.inning_count; j++){
+								ht +=		'<tr>';
+								ht +=			'<td width="40%" class="tr inningcount'+i+'">0</td>';
+								ht +=			'<td width="20%" class="tc">:</td>';
+								ht +=			'<td width="40%" class="tl inningcount'+i+'">0</td>';
+								ht +=		'</tr>';
+							}
+							ht +=		'</tbody></table>';
+							ht +=		'<hr class="mt10"></hr>';
+							ht +=		'<div class="mui-button-row">';
+							ht +=			'<button type="button" class="mui-btn mui-btn-green watch" data-tags="'+wholeDetail.matchList[i].id+'">观赛</button>&nbsp;&nbsp;';
+							ht +=			'<button type="button" class="mui-btn mui-btn-danger judge" data-tags="'+wholeDetail.matchList[i].id+'">执裁</button>';
+							ht +=		'</div>';
+							ht +=	'</div>';
+							break;
+						case '1':
+						case '3':
+						case '4':
+							ht +=	'<div class="competitionInfo mt20" data-tags="'+wholeDetail.matchList[i].id+'">';
+							ht +=		'<img src="img/before.png" width="20px" height="20px" class="pa" style="top:0;right: 0;" />';
+							ht +=		'<table width="100%"><tbody>';
+							ht +=			'<tr>';
+							ht +=				'<td width="20%" class="tc oneplayer" data-tags="a1">';
+							if(wholeDetail.matchList[i].team_1_a != -1 && confirmPlayerExist(wholeDetail.playerList, wholeDetail.matchList[i].team_1_a)){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_1_a)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_1_a)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员1</span>';
+							}
+							ht +=				'</td>';
+							ht +=				'<td width="20%" class="tc oneplayer" data-tags="a2">';
+							if(wholeDetail.matchList[i].team_1_b != -1 && confirmPlayerExist(wholeDetail.playerList, wholeDetail.matchList[i].team_1_b)){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_1_b)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_1_b)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员2</span>';
+							}
+							ht +=				'</td>';
+							ht +=				'<td width="20%" class="tc">VS</td>';
+							ht +=				'<td width="20%" class="tc oneplayer" data-tags="b1">';
+							if(wholeDetail.matchList[i].team_2_a != -1 && confirmPlayerExist(wholeDetail.playerList, wholeDetail.matchList[i].team_2_a)){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_2_a)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_2_a)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员3</span>';
+							}
+							ht +=				'</td>';
+							ht +=				'<td width="20%" class="tc oneplayer" data-tags="b2">';
+							if(wholeDetail.matchList[i].team_2_b != -1 && confirmPlayerExist(wholeDetail.playerList, wholeDetail.matchList[i].team_2_b)){
+								ht +=				'<a href="#"><img src="http://banbaisport.oss-cn-beijing.aliyuncs.com/'+getPlayerImg(wholeDetail.playerList, wholeDetail.matchList[i].team_2_b)+'" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>'+getPlayerName(wholeDetail.playerList, wholeDetail.matchList[i].team_2_b)+'</span>';
+							} else {
+								ht +=				'<a href="#"><img src="img/teamleader.png" width="40px" height="40px" style="border-radius: 50%;"></a><br /><span>运动员1</span>';
+							}
+							ht +=				'</td>';
+							ht +=			'</tr>';
+							for(var j = 0; j < wholeDetail.inning_count; j++){
+								ht +=		'<tr>';
+								ht +=			'<td width="20%" class="tr inningcount'+i+'" colspan="2">0</td>';
+								ht +=			'<td width="20%" class="tc">:</td>';
+								ht +=			'<td width="20%" class="tl inningcount'+i+'" colspan="2">0</td>';
+								ht +=		'</tr>';
+							}
+							ht +=		'</tbody></table>';
+							ht +=		'<hr class="mt10"></hr>';
+							ht +=		'<div class="mui-button-row">';
+							ht +=			'<button type="button" class="mui-btn mui-btn-green watch"  data-tags="'+wholeDetail.matchList[i].id+'">观赛</button>&nbsp;&nbsp;';
+							ht +=			'<button type="button" class="mui-btn mui-btn-danger judge" data-tags="'+wholeDetail.matchList[i].id+'">执裁</button>';
+							ht +=		'</div>';
+							ht +=	'</div>';
+							break;
+						default:
+							break;
+					}
+					ht += '</div>';
+				}
+				$('.matches').html( ht );
+           	}catch(e){}
+        }
+		function getPlayerImg(obj, id){
+			for(var i = 0; i < obj.length; i++){
+				if(obj[i].player_id == id){
+					return obj[i].img_url;
+				}
+			}
+			return '';
+		}	
+		function getPlayerName(obj, id){
+			for(var i = 0; i < obj.length; i++){
+				if(obj[i].player_id == id){
+					return obj[i].player_name;
+				}
+			}
+			return '';
+		}
+		function confirmPlayerExist(obj, id){ 
+			for(var i = 0; i < obj.length; i++){
+				if(obj[i].player_id == id){
+					return true;
+				}
+			}
+			return false;
+		}
+		
+		function addMatch(){
+		      typePicker.show(function(items) {
+			        type = JSON.stringify(items[0].value);
+					createMatch();
+			  });
+		}
+		
+		function createMatch(){
+           	var aoData=[];
+           	aoData.push( { "name":"id_check",			"value": id_check} );
+           	aoData.push( { "name":"smallSchedule.id", 	"value": schedule_id } );
+           	aoData.push( { "name":"type",				"value": type } );
+			doSendAjaxRequest("/actions/SmallSchedule.action?insertSmallScheduleMatch",aoData,callbackOne);
+        }
+	</script>
+	
+    <style>
+    		* {color: #323a45;}
+    		header.mui-bar.mui-bar-nav {background-color: #18b4ed;}
+    		header.mui-bar.mui-bar-nav a{color:#fff;}
+    		header.mui-bar.mui-bar-nav span{color:#fff; height:1.6em}
+    		header.mui-bar.mui-bar-nav h1 {color:#fff;}
+    		header {
+    			box-shadow: none;
+    			-webkit-box-shadow:none;
+    		}
+
+		.mui-content table .left {
+			background: url(img/VS_background_01.png);
+		}
+		.mui-content table .score {
+			width: 120px;
+			background: url(img/VS_background_02.png);
+			background-position: center;
+			background-size: 120px 120px;
+			color: #fff;
+		}
+		.mui-content table .right {
+			background: url(img/VS_background_03.png);
+		}
+		.mui-content td span {display: inline-block;}
+		
+		.competition {
+    			padding: 15px 5px;
+    			background-color: #fff;
+    			margin-bottom: 20px;
+    			border-radius: 2%;
+    			box-shadow: 5px 5px 5px #888888;
+    		}
+		.competition td.typebackground {
+			background: url(img/typebackground.png);
+			background-repeat: no-repeat;
+			background-position: center;
+			background-size: 40px 35px;
+			color:#fff;
+		}
+		hr {border: 0.5px solid #ccc;}
+    </style>
+</head>
+<body>
+	<div class="mui-content">
+		<table class="tc" width="100%" height="120px">
+			<tr>
+				<td class="left tc"><img src="img/teamleader.png" width="60px" height="60px" style="border-radius: 50%;" /><br /><span>红队</span></td>
+				<td class="score"><span class="f2d0 score1">0</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;VS&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="f2d0 score2">0</span></td>
+				<td class="right"><img src="img/teamleader.png" width="60px" height="60px" style="border-radius: 50%;" /><br /><span>蓝队</span></td>
+			</tr>	
+		</table>
+		<table class="mt10" width="100%">
+			<tr>
+				<td width="5%" height="15px"></td>
+				<td width="10%" height="15px" style="background-color: #52c0d8;"></td>
+				<td width="20%" height="15px" class="tl">&nbsp;已结束</td>
+				<td width="10%" height="15px" style="background-color: #c63a3a;"></td>
+				<td width="20%" height="15px" class="tl">&nbsp;进行中</td>
+				<td width="10%" height="15px" style="background-color: #a6a6a6;"></td>
+				<td width="20%" height="15px" class="tl">&nbsp;未开始</td>
+				<td width="5%" height="15px"></td>
+			</tr>
+		</table>
+		<div class="matches">
+			
+		</div>
+	</div>
+	<script>
+		/*----------------------------------向选择上场运动员页面发送数据开始--------------------------------------*/
+		$(document).on("click", ".oneplayer a", function(e){
+			var detailPage = null;
+		  	if(!detailPage){
+		    		detailPage = plus.webview.getWebviewById('selectOnePlayer.html');
+		  	}
+		  	var matchId = $(this).parent().parent().parent().parent().parent().attr("data-tags");
+		  	mui.fire(detailPage,'selectedPlayer',{
+		  		wholeDetail: wholeDetail,
+		  		matchId: matchId,
+		  		pos: $(this).parent().attr("data-tags")
+		  	});
+			mui.openWindow({ id:"selectOnePlayer.html", url:"selectOnePlayer.html"});
+		});
+		/*----------------------------------向选择上场运动员页面发送数据结束--------------------------------------*/
+		/*----------------------------------------观看比赛事件处理开始-------------------------------------------*/
+		$(document).on("click", ".watch", function(e){
+			/** var detailPage = mui.preload({
+			    url: "viewerLiving.html",
+			    id: "viewerLiving.html"
+			});
+			var matchId = $(this).attr("data-tags");
+			mui.fire(detailPage,'viewer',{
+		  		wholeDetail: wholeDetail,
+		  		matchId: matchId
+		  	});
+			mui.openWindow({ id:"viewerLiving.html", url:"viewerLiving.html"});
+			*/
+		});
+		/*----------------------------------------观看比赛事件处理结束-------------------------------------------*/
+		/*----------------------------------------裁判执裁事件处理开始-------------------------------------------*/
+		$(document).on("click", ".judge", function(e){
+			var detailPage = mui.preload({
+			    url: "refereeLiving.html",
+			    id: "refereeLiving.html"
+			});
+			var matchId = $(this).attr("data-tags");
+			mui.fire(detailPage,'referee',{
+		  		wholeDetail: wholeDetail,
+		  		matchId: matchId
+		  	});
+			mui.openWindow({ id:"refereeLiving.html", url:"refereeLiving.html"});
+		});
+		
+		(function(m, doc) {
+			m.ready(function() {
+				//普通示例
+				typePicker = new m.PopPicker();
+				typePicker.setData([{
+					value: 0,
+					text: '男单'
+				}, {
+					value: 1,
+					text: '男双'
+				}, {
+					value: 2,
+					text: '女单'
+				}, {
+					value: 3,
+					text: '女双'
+				}, {
+					value: 4,
+					text: '混双'
+				}]);
+			});
+		})(mui, document);
+	</script>
+</body>
+</html>

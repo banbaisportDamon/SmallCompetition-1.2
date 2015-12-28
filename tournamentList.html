@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <script src="js/configure.js"></script>
+	<script src="js/mui.min.js"></script>
+	<script src="js/jquery-1.10.2.min.js"></script>
+	<script src="js/common.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/base.css" rel="stylesheet"/>
+	
+    <script type="text/javascript" charset="utf-8">
+       var user_id = -1;
+       var id_check = '10,0';
+       var resultList=[];
+	   
+	 $(document).ready(function() {
+	      user_id=getUrlParam(document.URL,"userId");
+		  var loginTime=getUrlParam(document.URL,"loginTime");
+		  if ( user_id ) {
+		    id_check = user_id+","+loginTime;
+		  }
+          getResult();
+     } );
+	 
+	    function showDetailPage(sid,isCanopt){
+		    parent.showDetailPage(sid,isCanopt);
+		}
+        
+        function getResult(){
+           	var aoData=[];
+           	aoData.push( { "name":"id_check","value": id_check} );
+           	aoData.push( { "name":"smallSchedule.create_user", "value":-1 } );
+           	aoData.push( { "name":"smallSchedule.op_leader_id","value":-1 } );
+           	aoData.push( { "name":"smallSchedule.rule_type", "value":-1 } );
+           	aoData.push( { "name":"smallSchedule.status", "value":-1 } );
+			doSendAjaxRequest("/actions/SmallSchedule.action?getSmallScheduleList",aoData,getCompetitionRankListCallback);
+        }
+
+        function getCompetitionRankListCallback(obj){
+           try{
+            resultList=obj.aaData;
+            var ht='';
+            var ruleType = ['PK对抗赛','单打排位赛','单打循环赛','双打排位赛','双打循环赛','交叉双打积分赛'];
+			var isCanopt=false;
+            for(var i = 0; i < resultList.length; i++){
+			    if ( resultList[i].create_user == user_id ) {
+				   isCanopt=true;
+				   ht +=	'<div class="tournament" onclick="showDetailPage('+resultList[i].id+',true)">';
+				} else {
+				   isCanopt=false;
+				   ht +=	'<div class="tournament" onclick="showDetailPage('+resultList[i].id+',false)">';
+				}
+            	ht +=		'<div class="tournament-name tc mb10" height="40px"><a href="#">'+resultList[i].title+'</a></div>';
+            	ht += 		'<hr></hr>';
+            	ht +=		'<div class="pl10 pr10">';
+            	ht +=			'<table width="100%" class="tl">';
+				ht +=				'<tr>';
+				ht +=					'<td class="competitionLogo" width="80px" rowspan=3><img src="img/VS_background_01.png" width="60px" height="60px"/></td>';
+				var d = new Date(resultList[i].create_time);     
+				ht +=					'<td class="f0d8"><img src="img/clock.png" width="10px" height="10px">&nbsp;&nbsp;时间：'+formatDate(d)+'</td>';
+				ht +=				'</tr>';
+				ht +=				'<tr>';
+				ht +=					'<td class="f0d8"><img src="img/schedule_01.png" width="10px" height="14px"/>&nbsp;&nbsp;赛制：'+ruleType[resultList[i].rule_type]+'</td>';
+				ht +=				'</tr>';
+				ht +=				'<tr>';
+				ht +=					'<td class="f0d8"><img src="img/location_02.png" width="10px" height="14px" />&nbsp;&nbsp;地点：'+resultList[i].addr+'</td>';
+				ht +=				'</tr>';
+				ht +=			'</table>';
+				ht +=		'</div>';
+				ht +=	'</div>';
+            }
+			if ( ht == '' ) {
+			   ht='暂无数据';
+			}
+            $(".competitionList").html( ht );
+           }catch(e){}
+        }
+    </script>
+    <style>
+    		* {color: #323a45;}
+    		input.mui-input-clear {background-color: #fff;}
+    	    	.tournament {
+    			padding: 15px 5px;
+    			background-color: #fff;
+    			margin-bottom: 20px;
+    			border-radius: 2%;
+    			box-shadow: 5px 5px 5px #888888;
+    		}
+    		.tournament .competitionLogo img {border-radius: 50%;}
+    		.tournament tr {color: #6e6e6e;}
+    		.tournament tr:first-child {color: #000;}
+    		.tournament td {height: 20px;}
+    		.tournament .tournament-name a { 
+    			height: 15px; 
+    			color: #18b4ed; 
+    			line-height: 15px;
+    		}
+    		hr {
+    			border: 0.5px solid #ccc;
+    		}
+    		.tournament tr {height: 20px;}
+    		#topPopover {
+			position: fixed;
+			top: 12px;
+			right: 6px;
+			width: 120px;
+			}
+		#topPopover .mui-popover-arrow {
+			left: auto;
+			right: 6px;
+		}
+    </style>
+</head>
+<body>
+	<div class="mui-content">
+		<div class="competitionList">
+			<div class="mui-loading">
+				<div class="mui-spinner">
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

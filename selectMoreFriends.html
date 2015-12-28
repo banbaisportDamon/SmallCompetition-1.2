@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+		<title>羽球达人</title>
+		<script src="js/configure.js"></script>
+		<script src="js/common.js"></script>
+		<link href="css/mui.min.css" rel="stylesheet" />
+		<link href="css/mui.indexedlist.css" rel="stylesheet" />
+		<link href="css/base.css" rel="stylesheet"/>
+		<style>
+			html,
+			body {
+				height: 100%;
+				overflow: hidden;
+			}
+			* {color: #323a45;}
+			header.mui-bar.mui-bar-nav {background-color: #18B4ED;}
+			header.mui-bar.mui-bar-nav a {color:#fff;}
+	    	header.mui-bar.mui-bar-nav h1 {color:#fff;}
+	    	header.mui-bar.mui-bar-nav span.mui-icon {color: #fff;}
+	    		
+			.mui-bar {
+				-webkit-box-shadow: none;
+				box-shadow: none;
+			}
+			#done.mui-disabled{
+				color: gray;
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="mui-content">
+			<div id='list' class="mui-indexed-list">
+				<div class="mui-indexed-list-search mui-input-row mui-search">
+					<input type="search" class="mui-input-clear mui-indexed-list-search-input" placeholder="搜索好友">
+				</div>
+				<div class="mui-indexed-list-bar">
+					<a>#</a>
+					<a>A</a>
+					<a>B</a>
+					<a>C</a>
+					<a>D</a>
+					<a>E</a>
+					<a>F</a>
+					<a>G</a>
+					<a>H</a>
+					<a>I</a>
+					<a>J</a>
+					<a>K</a>
+					<a>L</a>
+					<a>M</a>
+					<a>N</a>
+					<a>O</a>
+					<a>P</a>
+					<a>Q</a>
+					<a>R</a>
+					<a>S</a>
+					<a>T</a>
+					<a>U</a>
+					<a>V</a>
+					<a>W</a>
+					<a>X</a>
+					<a>Y</a>
+					<a>Z</a>
+				</div>
+				<div class="mui-indexed-list-alert"></div>
+				<div class="mui-indexed-list-inner">
+					<div class="mui-loading">
+						<div class="mui-spinner">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<script src="js/mui.min.js"></script>
+		<script src="js/mui.indexedlist.js"></script>
+		<script src="js/configure.js"></script>
+		<script src="js/jquery-1.10.2.min.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			mui.init();
+			/*------------------------------------------初始化好友列表开始-------------------------------------------*/
+			var id_check = "1439286113287,0";
+       		var resultList=[];
+       		
+			$(document).ready(function() {
+	           getResult();
+	       	} );
+        
+	        function getResult(){
+	           	var aoData=[];
+	           	aoData.push( { "name":"id_check","value": id_check } );
+	           	aoData.push( { "name":"type", "value": "includedMe" } );
+				doSendAjaxRequest("/actions/Member.action?getMyFriendList",aoData,getCompetitionRankListCallback);
+	        }
+
+	        function getCompetitionRankListCallback(obj){
+	        		try{
+	            		resultList=obj.aaData;
+	            		var ht=	'<div class="mui-indexed-list-empty-alert">没有数据</div>';
+	            		ht +=	'<ul class="mui-table-view">';
+	            		for(var i = 0; i < resultList.length; i++){
+	            			ht +=  '<li data-group="'+resultList[i].letter+'" class="mui-table-view-divider mui-indexed-list-group">'+resultList[i].letter+'</li>';
+	            			for(var j = 0; j < resultList[i].list.length; j++){	
+							ht += 	'<li data-value="'+resultList[i].list[j].friend_id+'" data-tags="'+resultList[i].list[j].friend_img+'" class="mui-table-view-cell mui-indexed-list-item mui-checkbox mui-left">';
+							ht +=	'<input type="checkbox" />'+resultList[i].list[j].friend_name+'</li>';
+	            			}
+					}
+	            		ht += '</ul>';
+	            		$(".mui-indexed-list-inner").html(ht);
+	           } catch(e) {
+			   }
+	        }
+
+			/*------------------------------------------初始化好友列表结束-------------------------------------------*/
+			/*------------------------------------------标记已选中好友开始-------------------------------------------*/
+			var wholeDetail = [];
+			var matchId = -1;
+			var pos = '';
+			window.addEventListener('selectedFriends',function(event){
+				wholeDetail = event.detail.wholeDetail;
+				matchId = event.detail.matchId;
+				pos = event.detail.pos;
+				for(var i = 0; i < wholeDetail.playerList.length; i++){
+					var condition = "li[data-value="+wholeDetail.playerList[i].player_id+"]";
+					$(condition).find("input").attr("checked",true);
+				}
+			});
+			/*------------------------------------------标记以选中好友结束-------------------------------------------*/
+			/*-----------------------------------------处理选中以及完成开始------------------------------------------*/
+			function modifyTournament(){
+	           	var aoData=[];
+	           	aoData.push( { "name": "smallSchedule.id",				"value": wholeDetail.id } );
+	           	aoData.push( { "name": "id_check",						"value": id_check } );
+	           	aoData.push( { "name": "smallSchedule.title", 			"value": wholeDetail.title } );
+				aoData.push( { "name": "smallSchedule.addr", 			"value": wholeDetail.addr } );
+				aoData.push( { "name": "smallSchedule.op_leader_id", 	"value": wholeDetail.op_leader_id } );
+				aoData.push( { "name": "smallSchedule.rule_type", 		"value": wholeDetail.rule_type } );
+				aoData.push( { "name": "smallSchedule.inning_count", 	"value": wholeDetail.inning_count } );
+				aoData.push( { "name": "smallSchedule.win_score", 		"value": wholeDetail.win_score } );
+				aoData.push( { "name": "smallSchedule.max_score", 		"value": wholeDetail.max_score } );
+				aoData.push( { "name": "smallSchedule.sort_type", 		"value": wholeDetail.sort_type } );
+				aoData.push( { "name": "smallSchedule.invite_team",		"value": wholeDetail.invite_team } );
+				aoData.push( { "name": "playerNames",					"value": playerNames.join() } );
+				aoData.push( { "name": "playerIds",						"value": playerIds.join() } );
+				doSendAjaxRequest("/actions/SmallSchedule.action?updateSmallSchedule",aoData,callbackForModify);
+	        }
+			function callbackForModify(obj){
+				try{
+					if(obj.status == true){
+						// 获取新的wholeDetail并返回
+						getNewDetail();
+					}
+				} catch(e){}
+			}
+			
+			function getNewDetail(){
+	           	var aoData=[];
+	           	aoData.push( { "name":"id_check","value": id_check} );
+	           	aoData.push( { "name":"smallSchedule.id", "value": wholeDetail.id } );
+				doSendAjaxRequest("/actions/SmallSchedule.action?getSmallScheduleDetail",aoData,callbackForNewDetail);
+	        }
+			
+			function callbackForNewDetail(obj){
+	           	try{
+	           		wholeDetail = obj.body;
+	           	
+					var detailPage = null;
+			  		if(!detailPage){
+			    			detailPage = plus.webview.getWebviewById('selectOnePlayer.html');
+			  		}
+			  		mui.fire(detailPage,'selectedPlayer',{
+			  			wholeDetail: wholeDetail,
+			  			matchId:matchId,
+			  			pos:pos
+			  		});
+					mui.openWindow({ 
+						id:"selectOnePlayer.html", 
+						url:"selectOnePlayer.html",
+						createNew:false,
+						show: {
+							aniShow: 'slide-in-left',
+							uration: 200
+		                },
+		                waiting: {
+		                    autoShow: true, //自动显示等待框
+		                    title: '正在加载...', //等待对话框上显示的提示内容
+		                }
+					});
+	           }catch(e){}
+	        }
+			
+			var playerNames = [];
+			var playerIds = [];
+			mui.ready(function() {
+				var list = document.getElementById('list');
+				var done = document.getElementById('done');
+				//calc hieght
+				list.style.height = document.body.offsetHeight + 'px';
+				//create
+				window.indexedList = new mui.IndexedList(list);
+				//done event
+				done.addEventListener('tap', function() {
+					var checkboxArray = [].slice.call(list.querySelectorAll('input[type="checkbox"]'));
+					playerNames.length = 0;
+					playerIds.length = 0;
+					checkboxArray.forEach(function(box) {
+						if (box.checked) {
+							playerIds.push( box.parentNode.getAttribute('data-value') );
+							playerNames.push( box.parentNode.innerText );
+						}
+					});
+
+					if (playerIds.length > 0) {
+					  	// 修改小型比赛数据, 包含获取新数据
+						modifyTournament();
+					} else {
+						mui.alert('你没选择任何好友');
+					}
+				}, false);
+				
+				mui('.mui-indexed-list-inner').on('change', 'input', function() {
+					var count = list.querySelectorAll('input[type="checkbox"]:checked').length;
+					var checkboxArray = [].slice.call(list.querySelectorAll('input[type="checkbox"]'));
+					playerNames = [];
+					playerIds = [];
+					checkboxArray.forEach(function(box) {
+						if (box.checked) {
+							playerIds.push( box.parentNode.getAttribute('data-value') );
+							playerNames.push( box.parentNode.innerText );
+						}
+					});
+					
+					parent.setDoneBtnText(count,playerIds,playerNames);
+				});
+			});
+		</script>
+	</body>
+
+</html>

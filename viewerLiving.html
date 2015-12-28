@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no" />
+  	<meta name="apple-mobile-web-app-capable" content="yes">
+	<meta name="apple-mobile-web-app-status-bar-style" content="black">
+		
+    <script src="js/mui.min.js"></script>
+    <link href="css/mui.min.css" rel="stylesheet"/>
+    <link href="css/base.css" rel="stylesheet"/>
+    <!--
+    <script type="text/javascript" charset="utf-8">
+      	mui.init();
+    </script>-->
+    <style>
+    		* {color: #323a45;}
+    		header.mui-bar.mui-bar-nav {background-color: #18b4ed;}
+    		header.mui-bar.mui-bar-nav a{color:#fff;}
+    		header.mui-bar.mui-bar-nav span{color:#fff; height:1.6em}
+    		header.mui-bar.mui-bar-nav h1 {color:#fff;}
+    		header {
+    			box-shadow: none;
+    			-webkit-box-shadow:none;
+    		}
+		
+		.mui-content { background-color: #fff; min-height: 700px;}
+		.mui-content h3 {font-weight:normal;}
+		.mui-content #competitionBar #barImg {
+			background-color: #000;
+			background: url("img/scorebar_01.png") repeat-x;
+			background-size: auto 2em;
+			-webkit-background-size:auto 2em;
+		}
+		.mui-content #baseInfo { top: -2em; }
+		.mui-content #baseInfo table { line-height: 1em }
+		
+		.mui-content #competitionLiving { background:url("img/courtfloor.png"); background-repeat: repeat-y repeat-x; top:-1.5em;}
+		.mui-content #competitionLiving table { top:20px; }
+		.mui-content #competitionLiving .scoreboardLeft,.scoreboardRight { 
+			background:url("img/scoreboard.png"); 
+			background-position: center; 
+			background-repeat: no-repeat; 
+			background-size:50px 60px;
+		}
+		
+		.mui-content #positionLiving { 
+			background: url("img/court.png"); 
+			background-position: center; 
+			background-repeat: no-repeat; 
+			background-size: 100% 100%; 
+		}
+    </style>
+</head>
+<body>
+	<header class="mui-navbar-inner mui-bar mui-bar-nav">
+		<a class="mui-action-back mui-icon mui-icon-left-nav mui-pull-left" href="createMinorTournamentNew.html"></a>
+		<span id="menu" class="mui-action-menu mui-icon mui-icon-plusempty mui-pull-right"></span>
+		<h1 class="mui-center mui-title tc">执裁详情</h1>
+	</header>
+	<div class="mui-content pr">
+		<h3 class="title tc pb10 pt10">第一届清华羽校友羽毛球比赛</h3>
+		<div id="competitionBar" class="pr">
+			<div id="barImg">&nbsp;<br />&nbsp;</div>
+			
+			<div id="baseInfo" class="pr">
+	            <table class="tc" width="100%">
+	                <tbody>
+	                    <tr class="tc">
+	                        <td width="45%" id="team_1" colspan=2>海南队</td>
+	                        <td width="10%" id="competitionType">男双</td>
+	                        <td width="45%" id="team_2" colspan=2>湖南队</td>
+	                    </tr>
+	                    <tr><td>&nbsp;<td></tr>
+	                    <tr style="line-height:1.4em">
+	                        <td id="team1logo"><img src="img/teamleader.png" width="60px" height="60px" style="border-radius: 50%;"></td>
+	                        <td><span>黎明</span><br /><span>刘德华</span></td>
+	                        <td class="f1d5">VS</td>
+	                        <td><span>郭富城</span><br /><span>张学友</span></td>
+	                        <td id="team2logo"><img src="img/teamleader.png" width="60px" height="60px" style="border-radius: 50%;"></td>
+	                    </tr>
+	                </tbody>
+	            </table>
+            </div>
+        </div>
+		<div id="competitionLiving" class="pr">
+            <table class="tc pr" width="100%">
+                <thead>
+                    <tr height="60px" class="f2d0">
+                    		<td width="50%"><td>
+                        <td width="60px" class="scoreboardLeft">&nbsp;&nbsp;<span>0</span>&nbsp;&nbsp;</td>
+                        <td width="30px">&nbsp;&nbsp;:&nbsp;&nbsp;</td>
+                        <td width="60px" class="scoreboardRight">&nbsp;&nbsp;<span>0</span>&nbsp;&nbsp;</td>
+                        <td width="50%"><td>
+                    </tr>
+                </thead>
+            </table>
+            
+            <div id="positionLiving" class="ml10 mr10 mt40">
+            		<table class="tc" width="100%">
+                    <tbody>
+                        <tr>
+                            <td width="7%" rowspan=2></td>
+                            <td width="28%" style="color:#fff">李宗伟</td>
+                            <td width="28%" rowspan=2><img src="img/rightup.png" width="80%" /></td>
+                            <td width="28%" style="color:#fff">李宗伟</td>
+                            <td width="7%" rowspan=2></td>
+                        </tr>
+                        <tr>
+                            <td style="color:#fff">林丹</td>
+                            <td style="color:#fff">林丹</td>
+                        </tr>
+                    </tbody>
+                </table>
+            	</div>
+            
+            <div id="roundBefore" class="tc mt20">   
+                <table width="100%">
+                    <tbody>
+                        <tr>
+                            <td class="score tr">31</td>
+                            <td width="30%">第一局</td>
+                            <td class="score tl">30</td>
+                        </tr>
+                        <tr>
+                            <td class="score tr">32</td>
+                            <td width="30%">第二局</td>
+                            <td class="score tl">29</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+	</div>
+	
+	<script src="js/jquery-1.10.2.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			var courtWidth = $(window).width() - 20;
+			var courtHeight = courtWidth / 2;
+			$("#positionLiving table").attr("height", courtHeight);
+		});
+		mui("#competitionBegin").on('tap', 'button', function(e){
+				mui.openWindow({ id:"bonusResult.html", url:"bonusResult.html"});
+			});
+	</script>
+</body>
+</html>
